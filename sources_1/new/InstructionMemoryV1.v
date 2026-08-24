@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 // 64-word Harvard instruction ROM. Unused and out-of-range locations read as
 // ADDI x0,x0,0 (the canonical RV32I NOP).
 module InstructionMemoryV1 #(
@@ -39,5 +36,3 @@ module InstructionMemoryV1 #(
                        ? memory[address[7:2]]
                        : NOP;
 endmodule
-
-`default_nettype wire
