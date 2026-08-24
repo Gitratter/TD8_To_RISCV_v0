@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module RegisterFileV1 (
     input  wire        clk,
     input  wire        reset,
@@ -31,5 +28,3 @@ module RegisterFileV1 (
         end
     end
 endmodule
-
-`default_nettype wire
