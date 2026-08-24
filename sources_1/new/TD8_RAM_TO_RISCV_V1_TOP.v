@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 // Board-facing top module. Its ports intentionally match the TD8 design so the
 // existing switches, LEDs, seven-segment display, and XDC pin assignments remain
 // usable during the migration.
@@ -66,5 +63,3 @@ module TD8_RAM_TO_RISCV_V1_TOP #(
             clk_ind <= clk_ind + 4'd1;
     end
 endmodule
-
-`default_nettype wire
