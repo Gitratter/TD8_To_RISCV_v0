@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 // v1 transition core:
 // - TD8-like non-pipelined, one instruction per enable pulse
 // - strict RV32I subset: ADD/SUB/AND/OR/SLT, ADDI/ANDI/ORI/SLTI,
@@ -170,5 +167,3 @@ module TD8_RISCV_V1_Core #(
     assign debug_pc          = pc;
     assign debug_instruction = instruction;
 endmodule
-
-`default_nettype wire
