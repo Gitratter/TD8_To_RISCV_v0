@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module ImmGenV1 (
     input  wire [31:0] instruction,
     output reg  [31:0] immediate
@@ -18,5 +15,3 @@ module ImmGenV1 (
         endcase
     end
 endmodule
-
-`default_nettype wire
