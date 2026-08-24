@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module ProgramCounterV1 (
     input  wire        clk,
     input  wire        reset,
@@ -16,4 +13,3 @@ module ProgramCounterV1 (
     end
 endmodule
 
-`default_nettype wire
