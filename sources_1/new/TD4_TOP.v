@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 // Compatibility wrapper retaining the original TD8 Vivado top-module name.
 module TD4_TOP #(
     parameter integer CLOCK_HZ = 100_000_000
@@ -25,5 +22,3 @@ module TD4_TOP #(
         .an(an)
     );
 endmodule
-
-`default_nettype wire
