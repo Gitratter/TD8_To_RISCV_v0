@@ -1,0 +1,30 @@
+read_verilog -sv \
+    sources_1/new/ProgramCounterV1.v \
+    sources_1/new/InstructionMemoryV1.v \
+    sources_1/new/RegisterFileV1.v \
+    sources_1/new/MainDecoderV1.v \
+    sources_1/new/ALUDecoderV1.v \
+    sources_1/new/ImmGenV1.v \
+    sources_1/new/ALUV1.v \
+    sources_1/new/DataMemoryV1.v \
+    sources_1/new/TD8_RISCV_V1_Core.v \
+    sim_1/new/yosys_v1_harness.v
+
+prep -top yosys_v1_harness -flatten
+async2sync
+memory_map
+opt
+
+# Two reset cycles followed by ten always-enabled instructions.  With input
+# 0x2a, the demo must store and display 0x2b, take the backward branch to
+# address 0x08, and never raise fault.
+sat -verify -seq 13 \
+    -set clk 1 \
+    -set reset 0 \
+    -set-at 1 reset 1 \
+    -set-at 2 reset 1 \
+    -prove-skip 12 \
+    -prove output_port 8'h2b \
+    -prove debug_pc 32'h00000008 \
+    -prove debug_mem_word0 32'h0000002b \
+    -prove fault 0

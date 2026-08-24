@@ -1,0 +1,18 @@
+read_verilog -sv \
+    sources_1/new/ClockEnableV1.v \
+    sources_1/new/ProgramCounterV1.v \
+    sources_1/new/InstructionMemoryV1.v \
+    sources_1/new/RegisterFileV1.v \
+    sources_1/new/MainDecoderV1.v \
+    sources_1/new/ALUDecoderV1.v \
+    sources_1/new/ImmGenV1.v \
+    sources_1/new/ALUV1.v \
+    sources_1/new/DataMemoryV1.v \
+    sources_1/new/TD8_RISCV_V1_Core.v \
+    sources_1/new/SEG7V1.v \
+    sources_1/new/TD8_RAM_TO_RISCV_V1_TOP.v \
+    sources_1/new/TD4_TOP.v
+
+hierarchy -check -top TD4_TOP
+proc
+check
