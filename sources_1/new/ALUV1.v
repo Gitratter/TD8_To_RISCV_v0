@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module ALUV1 (
     input  wire [31:0] operand_a,
     input  wire [31:0] operand_b,
@@ -28,4 +25,3 @@ module ALUV1 (
     end
 endmodule
 
-`default_nettype wire
