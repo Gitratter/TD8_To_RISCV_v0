@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module MainDecoderV1 (
     input  wire [6:0] opcode,
     output reg        reg_write,
@@ -52,5 +49,3 @@ module MainDecoderV1 (
         endcase
     end
 endmodule
-
-`default_nettype wire
