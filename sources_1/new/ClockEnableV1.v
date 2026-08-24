@@ -1,9 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
-// One-clock enable pulse generator.
-// TD8 used the same clock-enable style so the CPU can be observed at 1 Hz/10 Hz
-// without creating a second clock domain.
 module ClockEnableV1 #(
     parameter [31:0] DIVISOR = 32'd100_000_000
 ) (
@@ -29,5 +23,3 @@ module ClockEnableV1 #(
         end
     end
 endmodule
-
-`default_nettype wire
