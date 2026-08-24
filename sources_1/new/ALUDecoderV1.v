@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module ALUDecoderV1 (
     input  wire [1:0] alu_op,
     input  wire [2:0] funct3,
@@ -59,5 +56,3 @@ module ALUDecoderV1 (
         endcase
     end
 endmodule
-
-`default_nettype wire
