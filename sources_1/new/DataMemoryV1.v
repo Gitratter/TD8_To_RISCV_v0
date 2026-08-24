@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 // TD8-derived 256-byte memory, organized as four 8-bit banks so the RV32I
 // subset can perform one aligned 32-bit LW/SW per enabled CPU step.
 module DataMemoryV1 (
@@ -40,5 +37,3 @@ module DataMemoryV1 (
         end
     end
 endmodule
-
-`default_nettype wire
