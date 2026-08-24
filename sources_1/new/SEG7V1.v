@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`default_nettype none
-
 module SEG7V1 (
     input  wire [3:0] data,
     output reg  [6:0] seg
@@ -27,5 +24,3 @@ module SEG7V1 (
         endcase
     end
 endmodule
-
-`default_nettype wire
