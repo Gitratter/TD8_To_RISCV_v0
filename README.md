@@ -1,65 +1,62 @@
-# TD8_RAM_TO_RISCV_v1
+# TD8_To_RISCV_v0
 
-TD8由来の8bit CPUを基盤に、最小限のRV32Iサブセットへ移行した最初の動作基準版です。VGA、PS/2、テトリス、キャッシュ、パイプラインはまだ追加していません。
+A small, non-pipelined RISC-V processor in Verilog for the Digilent Basys 3. The design replaces the TD8 instruction set with a 12-instruction RV32I subset while retaining the switch input, LED output, and seven-segment display.
 
-## v1の位置づけ
+The RTL uses `V1` in module names; the repository name is `TD8_To_RISCV_v0`. The FPGA top is `TD4_TOP`.
 
-```text
-TD8 board shell
-├─ 1 Hz / 10 Hz clock enable
-├─ 8-bit switch input
-├─ 8-bit LED + seven-segment output
-└─ TD8_RISCV_V1_Core
-   ├─ 32-bit PC / 64-word instruction ROM
-   ├─ strict RV32I-subset decoder
-   ├─ 32 x 32-bit Register File
-   ├─ 32-bit ALU / Immediate Generator
-   └─ four 8-bit RAM banks (64 x 32-bit)
-```
+## Processor
 
-対応命令は次の12命令です。
+The core has a 32-bit program counter, 32 general-purpose registers, a 32-bit ALU, a 64-word instruction ROM, and 256 bytes of data RAM. Instruction and data memory are separate. Register `x0` always reads as zero.
+
+Each clock-enable pulse executes one instruction. The board logic runs from the 100 MHz oscillator and selects either one or ten enable pulses per second. These are instruction rates, not separate clock domains.
+
+Supported instructions:
 
 ```text
-ADD SUB AND OR SLT
+ADD  SUB  AND  OR  SLT
 ADDI ANDI ORI SLTI
-LW SW BEQ
+LW   SW   BEQ
 ```
 
-詳細は[`docs/V1_SCOPE.md`](docs/V1_SCOPE.md)、[`docs/MIGRATION_NOTES.md`](docs/MIGRATION_NOTES.md)、[`docs/VERIFICATION.md`](docs/VERIFICATION.md)、[`docs/ROADMAP.md`](docs/ROADMAP.md)を参照してください。
+Loads and stores require four-byte alignment. Illegal instructions, invalid data accesses, invalid instruction fetches, and taken branches to invalid targets assert `fault` and suppress instruction side effects. There is no trap handler or interrupt support.
 
-## FPGAでの使用
+## Data address map
 
-1. `sources_1/new/*.v`をVivadoプロジェクトへ追加する。
-2. Top moduleを`TD4_TOP`に設定する。
-3. `constrs_1/new/TD8_RAM_TO_RISCV_V1.xdc`を追加する。
-4. Basys 3の100 MHzクロックを使用して合成・実装する。
+| Address | Access | Function |
+|---|---|---|
+| `0x00000000`–`0x000000ff` | Aligned `LW` / `SW` | 256-byte RAM, stored in four byte banks |
+| `0x00000100` | `LW` | Zero-extended eight-bit switch input |
+| `0x00000104` | `LW` / `SW` | Eight-bit output register; writes use the low byte |
 
-`clksel=0`で1命令/秒、`clksel=1`で10命令/秒です。既定ROMでは、8bitスイッチ値に1を加えた値がLEDと7セグへ表示されます。`0xFF + 1`は`0x00`へ折り返します。
+Other data addresses cause a fault. The instruction ROM occupies a separate 256-byte address space beginning at PC zero.
 
-## シミュレーション
+## FPGA setup
 
-自己検査テストは以下です。
+1. Create a Vivado project for the Basys 3 (`xc7a35tcpg236-1`).
+2. Add the Verilog files in [sources_1/new](sources_1/new) as design sources.
+3. Add [TD8_RAM_TO_RISCV_V1.xdc](constrs_1/new/TD8_RAM_TO_RISCV_V1.xdc) as the constraint file.
+4. Select `TD4_TOP` as the top module, then run synthesis and implementation.
+5. Inspect the timing and implementation reports before generating and loading a bitstream.
 
-- `tb_v1_io`: 既定ROM、RAM round-trip、MMIO、8bit wrap
-- `tb_v1_instruction_set`: v1の全12命令、分岐成立／不成立、負即値
-- `tb_v1_faults`: 未対応命令、misalignedデータアクセス／分岐先の副作用禁止
-- `tb_v1_board`: TD4_TOP互換I/O、clock-enable、LED、7セグ
+`reset` is active high. `clksel=0` selects one instruction per second; `clksel=1` selects ten. The ROM repeatedly reads the switches, adds one, passes the result through RAM, and writes the low byte to the LEDs. Input `0xff` therefore produces `0x00`. The rightmost seven-segment digit displays `out[3:0]`; `clk_ind` counts completed instructions modulo 16. An output update takes several instructions.
 
-Icarus Verilogによる全テストの実行（リポジトリルートから）:
+## Simulation
+
+With PowerShell, Icarus Verilog, and `vvp` available, run from the repository root:
 
 ```powershell
 pwsh -File sim_1/run_tests.ps1
 ```
 
-Yosys用の合成前チェックと既定ROMのSAT smoke proofも`sim_1`に収録しています。
+| Testbench | Checks |
+|---|---|
+| `tb_v1_io` | ROM program, RAM round trip, MMIO, eight-bit wraparound |
+| `tb_v1_instruction_set` | All 12 instructions, branch outcomes, negative immediates |
+| `tb_v1_faults` | Invalid instructions and accesses; suppression of side effects |
+| `tb_v1_board` | Board wrapper, clock enables, LEDs, and seven-segment output |
 
-## 将来版の予定
-
-1. v2: RV32I命令範囲、分岐・ジャンプ、byte/halfword accessの拡張
-2. v3: 5段パイプライン、Forwarding、Stall、Flush
-3. v4: VGA、VRAM、PS/2をメモリマップドI/Oとして統合し、映像・入力単体試験
-4. v5: RISC-Vプログラムとしてテトリスを実行し、ゲーム動作を検証
+[sim_1](sim_1) also contains Yosys synthesis and bounded SAT scripts. These checks do not establish FPGA timing closure.
 
 ## License
 
-MIT License。参照元と同じライセンスを維持しています。
+[MIT](LICENSE).
